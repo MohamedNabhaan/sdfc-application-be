@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { getDb } from './db/db'
 import { signupValidator } from './schemas/signup-schema'
-import { getLoanByLoanNumber, getLoanbyUserId, getPaymentsByLoanId, getUserById, getUserByUsername, insertLoan, insertPayment, insertUser } from './db/queries';
+import { getLoanByLoanNumberAndUserId, getLoanbyUserId, getPaymentsByLoanId, getUserById, getUserByUsername, insertLoan, insertPayment, insertUser } from './db/queries';
 import { calculateEMI, cookieOpts, generateNextLoanNumber, genereateJwtToken } from './helpers';
 import { deleteCookie, setCookie } from 'hono/cookie';
 import "dotenv/config";
@@ -117,7 +117,7 @@ app
   const userId = c.get('jwtPayload').sub;
 
   try {
-    const loan = getLoanByLoanNumber(db, loanId);
+    const loan = getLoanByLoanNumberAndUserId(db, loanId,userId);
     if (loan!.user_id !== userId) {
       return c.json({ error: 'Unauthorized access to this loan' }, 403);
     }
@@ -154,7 +154,7 @@ app
   const loanNumber = c.req.param('loanNumber');
 
   try {
-    const loan = getLoanByLoanNumber(db, loanNumber);
+    const loan = getLoanByLoanNumberAndUserId(db, loanNumber, userId);
 
     if (!loan) {
       return c.json({ error: 'Loan not found' }, 404);
@@ -178,7 +178,7 @@ app
   const loanNumber = c.req.param('loanNumber');
 
   try {
-    const loan = getLoanByLoanNumber(db, loanNumber);
+    const loan = getLoanByLoanNumberAndUserId(db, loanNumber,userId);
 
     if (!loan) {
       return c.json({ error: 'Loan not found' }, 404);

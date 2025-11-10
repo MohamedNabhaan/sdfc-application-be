@@ -34,9 +34,9 @@ export const getLoanbyUserId = (db: Database, userId: UUID) => {
     return loans;
 }
 
-export const getLoanByLoanNumber = (db: Database, loanNumber: string) => {
-    const selectQuery = db.query('SELECT * FROM loans WHERE loanNumber = ?');
-    const loan = selectQuery.get(loanNumber) as { id: number; loanNumber: string; user_id: UUID; amount: number; startDate: string; endDate: string; interestRate: number; overdueAmount: number; emi: number; outstandingBalance: number } | undefined;
+export const getLoanByLoanNumberAndUserId = (db: Database, loanNumber: string, userId: UUID) => {
+    const selectQuery = db.query('SELECT * FROM loans WHERE loanNumber = ? AND user_id = ?');
+    const loan = selectQuery.get(loanNumber,userId) as { id: number; loanNumber: string; user_id: UUID; amount: number; startDate: string; endDate: string; interestRate: number; overdueAmount: number; emi: number; outstandingBalance: number } | undefined;
 
     const payments = getPaymentsByLoanId(db, loan!.id!);
     const totalPaid = payments.reduce((sum, p) => sum + p.totalAmount, 0);
